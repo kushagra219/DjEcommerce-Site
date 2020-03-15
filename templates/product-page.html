@@ -30,11 +30,12 @@
                 <span class="badge purple mr-1">{{ object.get_category_display }}</span>
               </a>
             </div>
-
+            {% if object.discount_price %}
             <p class="lead">
               <span class="mr-1">
-                <del>$200</del>
+                <del>{{object.discount_price}}</del>
               </span>
+            {% endif %}
               <span>{{object.price}}</span>
             </p>
 

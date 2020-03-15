@@ -6,4 +6,3 @@ admin.site.register(Item)
 admin.site.register(OrderItem)
 admin.site.register(Order)
 
-
