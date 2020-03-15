@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
 
@@ -8,7 +8,7 @@
     <div class="container wow fadeIn">
 
       <!-- Heading -->
-      <h2 class="my-5 h2 text-center">Checkout form</h2>
+      <h2 class="my-5 h2 text-center">Checkout Form</h2>
 
       <!--Grid row-->
       <div class="row">
@@ -18,19 +18,30 @@
 
           <!--Card-->
           <div class="card">
+            
+            <form>
+              {% csrf_token %}
+              {{ form|crispy }}
+              <button class='btn btn-primary' class='submit'>
+                Checkout
+              </button>
+            </form>
 
             <!--Card content-->
 
               <!--address-->
               <div class="md-form mb-5">
-                <input type="text" id="address" class="form-control" placeholder="1234 Main St">
-                <label for="address" class="">Address</label>
+                <!-- <label for="address" class="">Address</label> -->
+                {{ form.street_address }}
+                <!-- <input type="text" id="address" class="form-control" placeholder=""> -->
+                
               </div>
 
               <!--address-2-->
               <div class="md-form mb-5">
-                <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite">
-                <label for="address-2" class="">Address 2 (optional)</label>
+                {{ form.appartment_address }}
+                <!-- <input type="text" id="address-2" class="form-control" placeholder=""> -->
+                <!-- <label for="address-2" class="">Address 2 (optional)</label> -->
               </div>
 
               <!--Grid row-->
@@ -40,10 +51,11 @@
                 <div class="col-lg-4 col-md-12 mb-4">
 
                   <label for="country">Country</label>
-                  <select class="custom-select d-block w-100" id="country" required>
+                  <!-- <select class="custom-select d-block w-100" id="country" required>
                     <option value="">Choose...</option>
                     <option>United States</option>
-                  </select>
+                  </select> -->
+                  {{ form.country }}
                   <div class="invalid-feedback">
                     Please select a valid country.
                   </div>
@@ -52,7 +64,7 @@
                 <!--Grid column-->
 
                 <!--Grid column-->
-                <div class="col-lg-4 col-md-6 mb-4">
+                <!-- <div class="col-lg-4 col-md-6 mb-4">
 
                   <label for="state">State</label>
                   <select class="custom-select d-block w-100" id="state" required>
@@ -63,14 +75,15 @@
                     Please provide a valid state.
                   </div>
 
-                </div>
+                </div> -->
                 <!--Grid column-->
 
                 <!--Grid column-->
                 <div class="col-lg-4 col-md-6 mb-4">
 
                   <label for="zip">Zip</label>
-                  <input type="text" class="form-control" id="zip" placeholder="" required>
+                  {{ form.zip }}
+                  <!-- <input type="text" class="form-control" id="zip" placeholder="" required> -->
                   <div class="invalid-feedback">
                     Zip code required.
                   </div>
@@ -84,31 +97,25 @@
               <hr>
 
               <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="same-address">
-                <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
+                {{ form.same_billing_address }}
+                <!-- <input type="checkbox" class="custom-control-input" id="same-address"> -->
+                <label class="" for="same-address">Shipping address is the same as my billing address</label>
               </div>
               <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="save-info">
-                <label class="custom-control-label" for="save-info">Save this information for next time</label>
+                {{ form.save_info }}
+                <!-- <input type="checkbox" class="custom-control-input" id="save-info"> -->
+                <label class="" for="save-info">Save this information for next time</label>
               </div>
 
               <hr>
-
+               {% for method in form.payment_option %}
               <div class="d-block my-3">
-                <div class="custom-control custom-radio">
-                  <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked required>
-                  <label class="custom-control-label" for="credit">Credit card</label>
+                <div class="">
+                  <!-- <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked required> -->
+                  <label class="" for="credit">{{ method }}</label>
                 </div>
-                <div class="custom-control custom-radio">
-                  <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required>
-                  <label class="custom-control-label" for="debit">Debit card</label>
-                </div>
-                <div class="custom-control custom-radio">
-                  <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required>
-                  <label class="custom-control-label" for="paypal">Paypal</label>
-                </div>
-              </div>
-              <div class="row">
+                {% endfor %}
+              <!-- <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="cc-name">Name on card</label>
                   <input type="text" class="form-control" id="cc-name" placeholder="" required>
@@ -139,7 +146,7 @@
                   <div class="invalid-feedback">
                     Security code required
                   </div>
-                </div>
+                </div> -->
               </div>
               <hr class="mb-4">
               <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>

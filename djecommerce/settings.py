@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'crispy_forms',
     'debug_toolbar',
+    'django_countries',
 ]
 
 INTERNAL_IPS = [
@@ -109,3 +110,5 @@ def show_toolbar(request):
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": show_toolbar,
 }
+
+CRISPY_TEMPLATE_PACK = 'uni_form'

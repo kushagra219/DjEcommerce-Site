@@ -7,9 +7,10 @@ from django.shortcuts import (
 )
 from .models import *
 from django.views.generic import (
-    ListView, DetailView, View
+    ListView, DetailView, View, TemplateView
 )
 from django.utils import timezone
+from .forms import CheckoutForm
 
 
 class HomeView(ListView):
@@ -32,13 +33,24 @@ class OrderSummaryView(LoginRequiredMixin, View):
             return redirect("/")
 
 
-class ProductView(DetailView):
-    model = Item
+class ProductView(View):
+    model = OrderItem
     template_name = 'product-page.html'
 
 
-class CheckoutView(View):
-    template_name = 'checkout-page.html'
+class CheckoutView(TemplateView):
+    def get(self, *args, **kwargs):
+        form = CheckoutForm()
+        context = {
+            'form': form
+        }
+        return render(self.request, 'checkout-page.html', context)
+    
+    def post(self, *args, **kwargs):
+        form = CheckoutForm(self.request.POST or None)
+        if form.is_valid():
+            print("Form is Valid")
+            return redirect('core:checkout')
     
 
 @login_required
