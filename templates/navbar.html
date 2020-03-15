@@ -4,7 +4,7 @@
     <div class="container">
 
       <!-- Brand -->
-      <a class="navbar-brand waves-effect" href="#" target="_blank">
+      <a class="navbar-brand waves-effect" href="/" target="_blank">
         <strong class="blue-text">DjEcommerce</strong>
       </a>
 
@@ -39,7 +39,7 @@
         {% if user.is_authenticated %}
         <ul class="navbar-nav nav-flex-icons">
           <li class="nav-item">
-            <a class="nav-link waves-effect">
+            <a href="{% url 'core:order-summary' %}" class="nav-link waves-effect">
               <span class="badge red z-depth-1 mr-1"> {{ cart_item_count }} </span>
               <i class="fas fa-shopping-cart"></i>
               <span class="clearfix d-none d-sm-inline-block"> Cart </span>
