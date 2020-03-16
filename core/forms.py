@@ -1,5 +1,6 @@
 from django import forms
 from django_countries.fields import CountryField
+from django_countries.widgets import CountrySelectWidget
 
 PAYMENT_CHOICES = (
     ('S', 'Stripe'),
@@ -17,12 +18,16 @@ class CheckoutForm(forms.Form):
             'placeholder': 'XZ Apartment'
         }))
     country = CountryField(blank_label='(select country)').formfield(
-        attrs={
+        widget=CountrySelectWidget(attrs={
             'class': 'custom-select d-block w-100'
-        }
+        })
     )
-    zip = forms.CharField()
-    same_billing_address = forms.BooleanField(
+    zip = forms.CharField(widget=forms.TextInput(
+        attrs={
+            'class': 'form-control float-right',
+        }
+    ))
+    same_shipping_address = forms.BooleanField(
         widget=forms.CheckboxInput())
     save_info = forms.BooleanField(
         widget=forms.CheckboxInput())
