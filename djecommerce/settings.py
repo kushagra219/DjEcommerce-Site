@@ -112,3 +112,5 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 CRISPY_TEMPLATE_PACK = 'uni_form'
+
+STRIPE_SECRET_KEY = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"

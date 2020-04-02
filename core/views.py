@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -11,6 +12,11 @@ from django.views.generic import (
 )
 from django.utils import timezone
 from .forms import CheckoutForm
+
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+# `source` is obtained with Stripe.js; see https://stripe.com/docs/payments/accept-a-payment-charges#web-create-token
 
 
 class HomeView(ListView):
@@ -33,8 +39,8 @@ class OrderSummaryView(LoginRequiredMixin, View):
             return redirect("/")
 
 
-class ProductView(View):
-    model = OrderItem
+class ProductView(DetailView):
+    model = Item
     template_name = 'product-page.html'
 
 
@@ -65,7 +71,7 @@ class CheckoutView(TemplateView):
                     apartment_address=apartment_address,
                     country=country,
                     zip=zip,
-                    )
+                )
                 billing_address.save()
                 order.billing_address = billing_address
                 order.save()
@@ -82,8 +88,93 @@ class CheckoutView(TemplateView):
 class PaymentView(View):
     def get(self, *args, **kwargs):
         return render(self.request, 'payment.html')
-
+    
+    def post(self, *args, **kwargs):
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        token = self.request.POST.get('stripeToken')
+        amount = int(order.get_total() * 100)
+        # charge = stripe.Charge.create(
+        #     amount=amount,
+        #     currency="usd",
+        #     source=token,
+        #     # description="My First Test Charge (created for API docs)",
+        # )
         
+        try:
+
+            charge = stripe.Charge.create(
+                amount=amount,  # cents
+                currency="usd",
+                source=token
+            )
+
+            # create the payment
+            payment = Payment()
+            payment.stripe_charge_id = charge['id']
+            payment.user = self.request.user
+            payment.amount = order.get_total()
+            payment.save()
+
+            # assign the payment to the order
+
+            order_items = order.items.all()
+            order_items.update(ordered=True)
+            for item in order_items:
+                item.save()
+
+            order.ordered = True
+            order.payment = payment
+            # order.ref_code = create_ref_code()
+            order.save()
+
+            messages.success(self.request, "Your order was successful!")
+            return redirect("/")
+
+        except stripe.error.CardError as e:
+            body = e.json_body
+            err = body.get('error', {})
+            messages.warning(self.request, f"{err.get('message')}")
+            return redirect("/")
+
+        except stripe.error.RateLimitError as e:
+            # Too many requests made to the API too quickly
+            messages.warning(self.request, "Rate limit error")
+            return redirect("/")
+
+        except stripe.error.InvalidRequestError as e:
+            # Invalid parameters were supplied to Stripe's API
+            print(e)
+            messages.warning(self.request, "Invalid parameters")
+            return redirect("/")
+
+        except stripe.error.AuthenticationError as e:
+            # Authentication with Stripe's API failed
+            # (maybe you changed API keys recently)
+            messages.warning(self.request, "Not authenticated")
+            return redirect("/")
+
+        except stripe.error.APIConnectionError as e:
+            # Network communication with Stripe failed
+            messages.warning(self.request, "Network error")
+            return redirect("/")
+
+        except stripe.error.StripeError as e:
+            # Display a very generic error to the user, and maybe send
+            # yourself an email
+            messages.warning(
+                self.request, "Something went wrong. You were not charged. Please try again.")
+            return redirect("/")
+
+        except Exception as e:
+            # send an email to ourselves
+            messages.warning(
+                self.request, "A serious error occurred. We have been notifed.")
+            return redirect("/")
+
+        messages.warning(self.request, "Invalid data received")
+        return redirect("/payment/stripe/")
+
+
 @login_required
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)

@@ -17,19 +17,19 @@
               <div class='hideable_shipping_form'>
 
                 <div class="md-form mb-5">
-                  <input type='text' placeholder='' id='shipping_address' name='shipping_address' class='form-control' />
-                  <label for="shipping_address" class="">Address</label>
+                  <input type='text' placeholder='1234 Main St' id='shipping_address' name='shipping_address' class='form-control' />
+                  <label for="shipping_address" class=""></label>
                 </div>
 
                 <div class="md-form mb-5">
-                  <input type='text' placeholder='' id='shipping_address2' name='shipping_address2' class='form-control' />
-                  <label for="shipping_address2" class="">Address 2 (optional)</label>
+                  <input type='text' placeholder='Apartment or suite' id='shipping_address2' name='shipping_address2' class='form-control' />
+                  <label for="shipping_address2" class=""></label>
                 </div>
 
                 <div class="row">
                   <div class="col-lg-4 col-md-12 mb-4">
                     <label for="country">Country</label>
-                    {{ form.shipping_country }}
+                    {{ form.country }}
                     <div class="invalid-feedback">
                       Please select a valid country.
                     </div>
@@ -67,19 +67,19 @@
 
               <div class='hideable_billing_form'>
                 <div class="md-form mb-5">
-                  <input type='text' placeholder='' id='billing_address' name='billing_address' class='form-control' />
-                  <label for="billing_address" class="">Address</label>
+                  <input type='text' placeholder='1234 Main St' id='billing_address' name='billing_address' class='form-control' />
+                  <label for="billing_address" class=""></label>
                 </div>
 
                 <div class="md-form mb-5">
-                  <input type='text' placeholder='' id='billing_address2' name='billing_address2' class='form-control' />
-                  <label for="billing_address2" class="">Address 2 (optional)</label>
+                  <input type='text' placeholder='Apartment or suite' id='billing_address2' name='billing_address2' class='form-control' />
+                  <label for="billing_address2" class=""></label>
                 </div>
 
                 <div class="row">
                   <div class="col-lg-4 col-md-12 mb-4">
                     <label for="country">Country</label>
-                    {{ form.billing_country }}
+                    {{ form.country }}
                     <div class="invalid-feedback">
                       Please select a valid country.
                     </div>
@@ -136,3 +136,30 @@
   </main>
 
 {% endblock content %}
+
+{% block extra_scripts %}
+<script>
+var hideable_shipping_form = $('.hideable_shipping_form');
+var hideable_billing_form = $('.hideable_billing_form');
+
+var use_default_shipping = document.querySelector("input[name=use_default_shipping]");
+var use_default_billing = document.querySelector("input[name=use_default_billing]");
+
+use_default_shipping.addEventListener('change', function() {
+  if (this.checked) {
+    hideable_shipping_form.hide();
+  } else {
+    hideable_shipping_form.show();
+  }
+})
+
+use_default_billing.addEventListener('change', function() {
+  if (this.checked) {
+    hideable_billing_form.hide();
+  } else {
+    hideable_billing_form.show();
+  }
+})
+
+</script>
+{% endblock extra_scripts %}
